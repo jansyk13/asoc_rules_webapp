@@ -160,7 +160,7 @@ d3.chart.dependencyWheel = function (options) {
                     li.style['width'] = '100%';
                     li.innerHTML = "<span class='legenda' style='background-color:" + color + "'></span><span title='" + packageNames[d.index] + "'>" + packageNames[d.index] + "</span>";
                     legend.appendChild(li);
-                    return (packageNames[d.index].length > 20) ? packageNames[d.index].substr(0, 19) + '...' : packageNames[d.index];
+                    return (packageNames[d.index].length > 25) ? packageNames[d.index].substr(0, 24) + '...' : packageNames[d.index];
                 });
 
 
