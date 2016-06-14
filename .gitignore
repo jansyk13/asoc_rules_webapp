@@ -6,5 +6,3 @@ mvnw
 mvnw.cmd
 target/
 .idea/
-
-application.properties
