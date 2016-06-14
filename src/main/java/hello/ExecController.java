@@ -1,15 +1,11 @@
 package hello;
 
-import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +24,19 @@ public class ExecController {
 
     private final Connector connector;
 
+    private volatile int counter;
+
     @Autowired
     public ExecController(Connector connector) {
         this.connector = connector;
+        this.counter = 0;
     }
 
     @RequestMapping("/exec")
     public Response exec(@RequestParam(required = false) String suk, @RequestParam(required = false) String ant, @RequestParam(required = false) String conf, @RequestParam(required = false) String supp) {
         List<Connector.AsocRule> data = connector.data(new Criteria(ant, suk, conf, supp));
-
+        counter++;
+        logger.info("Execute number={}", counter);
         return new Response(data.stream().sorted(comparing(t -> t.getConf(), reverseOrder())).collect(toList()), new Double(conf), new Double(supp));
     }
 

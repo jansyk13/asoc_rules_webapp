@@ -1,23 +1,18 @@
 package hello;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import static org.springframework.util.StringUtils.isEmpty;
 
 import java.util.List;
 
-import static org.springframework.util.StringUtils.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by jansykora on 11.6.16.
  */
 @Service
 public class Connector {
-
-    private final Logger logger = LoggerFactory.getLogger(ExecController.class);
 
     private final JdbcTemplate jdbcTemplate;
 
