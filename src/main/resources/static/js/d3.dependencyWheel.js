@@ -36,6 +36,7 @@ d3.chart.dependencyWheel = function (options) {
     var width = 700;
     var margin = 150;
     var padding = 0.02;
+    var translations = [];
 
     function chart(selection) {
         selection.each(function (data) {
@@ -85,7 +86,7 @@ d3.chart.dependencyWheel = function (options) {
                         .filter(function (d) {
                             var bool = d.source.index != i && d.target.index != i;
                             if (bool == true) {
-                                var element = document.getElementsByClassName('data-' + hashFunction(packageNames[d.source.index]))[0];
+                                var element = document.getElementsByClassName('data-' + packageNames[d.source.index])[0];
                                 element.style.opacity = opacity;
                             }
                             return bool;
@@ -153,14 +154,19 @@ d3.chart.dependencyWheel = function (options) {
                 .text(function (d) {
                     var color = "hsl(" + parseInt(((hashFunction(packageNames[d.index]) - 97) / 26) * 360, 10) + ",90%,70%)";
 
+                    var text = packageNames[d.index].split('$');
+                    var idx = (translations[text[0]]['inner']['platform']).indexOf(text[1])
+                    var finalText = translations[text[0]]['cs'] + ' = ' +  translations[text[0]]['inner']['cs'][idx];
+
                     var legend = document.getElementById("triple");
                     var li = document.createElement("li");
-                    li.className = "data-" + hashFunction(packageNames[d.index]);
+                    li.className = "data-" + packageNames[d.index];
                     li.style['white-space'] = 'nowrap';
                     li.style['width'] = '100%';
-                    li.innerHTML = "<span class='legenda' style='background-color:" + color + "'></span><span title='" + packageNames[d.index] + "'>" + packageNames[d.index] + "</span>";
+                    li.innerHTML = "<span class='legenda' style='background-color:" + color + "'></span><span title='" +finalText + "'>" + finalText + "</span>";
                     legend.appendChild(li);
-                    return (packageNames[d.index].length > 25) ? packageNames[d.index].substr(0, 24) + '...' : packageNames[d.index];
+
+                    return (finalText.length > 25) ? finalText.substr(0, 24) + '...' : finalText;
                 });
 
 
@@ -199,6 +205,11 @@ d3.chart.dependencyWheel = function (options) {
     chart.padding = function (value) {
         if (!arguments.length) return padding;
         padding = value;
+        return chart;
+    };
+
+    chart.translations = function (value) {
+        translations = value;
         return chart;
     };
 

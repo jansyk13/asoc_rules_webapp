@@ -125,7 +125,7 @@
                     <option value="o_city">Destinace objednávky</option>
                     <option value="r_city">Lokace restaurace</option>
                     <option value="r_district">Čtvrť restaurace</option>
-                    <option value="r_exclusive">Exkluzivnost restaurace</option>
+                    <option value="r_exclusive">Exkluzivita restaurace</option>
                     <option value="r_min_order_price">Min. cena objednávky restaurace</option>
                     <option value="r_min_delivery_time">Cena rozvozu restaurace</option>
                 </select>
@@ -148,7 +148,7 @@
                     <option value="o_city">Destinace objednávky</option>
                     <option value="r_city">Lokace restaurace</option>
                     <option value="r_district">Čtvrť restaurace</option>
-                    <option value="r_exclusive">Exkluzivnost restaurace</option>
+                    <option value="r_exclusive">Exkluzivita restaurace</option>
                     <option value="r_min_order_price">Min. cena objednávky restaurace</option>
                     <option value="r_min_delivery_time">Cena rozvozu restaurace</option>
                 </select>
@@ -163,8 +163,8 @@
                     <option value="0.99">99%</option>
                     <option value="0.95">95%</option>
                     <option value="0.90">90%</option>
-                    <option value="0.85" selected>85%</option>
-                    <option value="0.80">80%</option>
+                    <option value="0.85">85%</option>
+                    <option value="0.80" selected>80%</option>
                     <option value="0.75">75%</option>
                     <option value="0.70">70%</option>
                     <option value="0.60">60%</option>
@@ -180,9 +180,9 @@
                     <option value="0.02">2%</option>
                     <option value="0.03">3%</option>
                     <option value="0.04">4%</option>
-                    <option value="0.05" selected>5%</option>
+                    <option value="0.05">5%</option>
                     <option value="0.10">10%</option>
-                    <option value="0.25">25%</option>
+                    <option value="0.25" selected>25%</option>
                     <option value="0.50">50%</option>
                     <option value="0.75">75%</option>
                 </select>
@@ -253,7 +253,8 @@
         var chart = d3.chart.dependencyWheel()
                 .width(700)    // also used for height, since the wheel is in a a square
                 .margin(200)   // used to display package names
-                .padding(.02);
+                .padding(.02)
+                .translations(translations);
         d3.select('#chart_placeholder')
                 .datum(data)
                 .call(chart);
@@ -263,36 +264,22 @@
         var $rules = $('#rules');
         $rules.text('');
 
+        if (asocRules.length == 0) {
+            return;
+        }
         $.map(asocRules, function (rule, i) {
-            var $row = $('<div></div>').addClass("row").addClass("expl-row").text('Antecedent=' + rule.ant + ' => Sukcedent=' + rule.suk + ' Spolehlivost=' + (rule.conf * 100).toString().substring(0, 4) + '% Podpora=' + (rule.supp * 100).toString().substring(0, 4) + '%');
+
+            var ant_text = rule.ant.split('$');
+            var suk_text = rule.suk.split('$');
+            var ant_idx = (translations[ant_text[0]]['inner']['platform']).indexOf(ant_text[1])
+            var suk_idx = (translations[suk_text[0]]['inner']['platform']).indexOf(suk_text[1])
+
+            var ant_final = translations[ant_text[0]]['cs'] + ' = ' +  translations[ant_text[0]]['inner']['cs'][ant_idx];
+            var suk_final = translations[suk_text[0]]['cs'] + ' = ' +  translations[suk_text[0]]['inner']['cs'][suk_idx];
+
+            var $row = $('<div></div>').addClass("row").addClass("expl-row").text('Antecedent=(' + ant_final + ') => Sukcedent=(' + suk_final + ') Spolehlivost=' + (rule.conf * 100).toString().substring(0, 4) + '% Podpora=' + (rule.supp * 100).toString().substring(0, 4) + '%');
             $rules.append($row);
         });
-    }
-
-    var combs = {
-        'o_delivery_price': ['UNDEF_0', '1_50', '51_100', '101_150', '151_UNDEF'],
-        'o_total_price': ['0_150', '151_300', '301_450', '451_UNDEF'],
-        'o_payed_by_label': ['Cash', 'Credit_Card'],
-        'o_origin_label': ['App', 'Web'],
-        'o_distance_a': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-        'o_first_order': ['0', '1'],
-        'o_delivery_type': ['courier', 'external', 'takeway', 'restaurant'],
-        'o_traffic_source_id': ['(direct)-(direct)-(not_set)', 'google-organic-(not_set)', 'app-app-', 'mpi.gpwebpay.com-referral-',
-            'adwords-cpc-brand', 'adwords-cpc-non-brand', 'facebook.com-referral-', 'seznam-organic-(not_set)', 'sklik-cpc-non-brand',
-            '3dsecure.gpwebpay.com-referral', 'facebook-organic-', 'cj-affil-cj_3753807', 'redir.netcentrum.cz-referral-'],
-        'o_dayssincepreviousorder': ['0_5', '6_10', '11_30', '31_100', '101_UNDEF'],
-        'o_city': ['Praha', 'Brno', 'Liberec', 'Ostrava', 'Hradec_Králové', 'Olomouc', 'Plzeň', 'České_Budějovice', 'Pardubice', 'Ústí_nad_Labem', 'Zlín',
-            'Frýdek-Místek', 'Opava', 'Chomutov', 'Mladá_Boleslav'],
-        'r_city': ['Praha', 'Brno', 'Ostrava', 'Plzeň', 'Liberec', 'Pardubice', 'Hradec_Králové', 'Olomouc', 'České_Budějovice', 'Ústí_nad_Labem', 'Zlín',
-            'Teplice', 'Karlovy_Vary', 'Mladá_Boleslav', 'Others'],
-        'r_district': ['Praha', 'Praha_1', 'Praha_10', 'Praha_11', 'Praha_12', 'Praha_13', 'Praha_14', 'Praha_15', 'Praha_16', 'Praha_17', 'Praha_18', 'Praha_19',
-            'Praha_2', 'Praha_20', 'Praha_21', 'Praha_22', 'Praha_3', 'Praha_4', 'Praha_5', 'Praha_6', 'Praha_7', 'Praha_8', 'Praha_9', 'Praha-Běchovice',
-            'Praha-Březiněves', 'Praha-Čakovice', 'Praha-Ďáblice', 'Praha-Dolní_Chabry', 'Praha-Dolní_Měcholupy', 'Praha-Dolní_Počernice', 'Praha-Dubeč',
-            'Praha-Klánovice', 'Praha-Kolovraty', 'Praha-Kunratice', 'Praha-Libuš', 'Praha-Lipence', 'Praha-Lysolaje', 'Praha-Petrovice', 'Praha-Řeporyje',
-            'Praha-Suchdol', 'Praha-Šeberov', 'Praha-Štěrboholy', 'Praha-Troja', 'Praha-Velká_Chuchle', 'Praha-Zbraslav', 'Praha-Zličín'],
-        'r_exclusive': ['0', '1'],
-        'r_min_order_price': ['UNDEF_0', '1_50', '51_100', '101_150', '151_200', '201_250', '251_UNDEF'],
-        'r_min_delivery_time': ['UNDEF_30', '31_60', '61_90', '91_UNDEF']
     }
 
     var translations = {
@@ -310,50 +297,134 @@
                 'cs': ['0 až 150', '151 až 300', '301 až 450', '451 a více']
             }
         },
-        'o_payed_by_label': ['Cash', 'Credit_Card'],
-        'o_origin_label': ['App', 'Web'],
-        'o_distance_a': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-        'o_first_order': ['0', '1'],
-        'o_delivery_type': ['courier', 'external', 'takeway', 'restaurant'],
-        'o_traffic_source_id': ['(direct)-(direct)-(not_set)', 'google-organic-(not_set)', 'app-app-', 'mpi.gpwebpay.com-referral-',
-            'adwords-cpc-brand', 'adwords-cpc-non-brand', 'facebook.com-referral-', 'seznam-organic-(not_set)', 'sklik-cpc-non-brand',
-            '3dsecure.gpwebpay.com-referral', 'facebook-organic-', 'cj-affil-cj_3753807', 'redir.netcentrum.cz-referral-'],
-        'o_dayssincepreviousorder': ['0_5', '6_10', '11_30', '31_100', '101_UNDEF'],
-        'o_city': ['Praha', 'Brno', 'Liberec', 'Ostrava', 'Hradec_Králové', 'Olomouc', 'Plzeň', 'České_Budějovice', 'Pardubice', 'Ústí_nad_Labem', 'Zlín',
-            'Frýdek-Místek', 'Opava', 'Chomutov', 'Mladá_Boleslav'],
-        'r_city': ['Praha', 'Brno', 'Ostrava', 'Plzeň', 'Liberec', 'Pardubice', 'Hradec_Králové', 'Olomouc', 'České_Budějovice', 'Ústí_nad_Labem', 'Zlín',
-            'Teplice', 'Karlovy_Vary', 'Mladá_Boleslav', 'Others'],
-        'r_district': ['Praha', 'Praha_1', 'Praha_10', 'Praha_11', 'Praha_12', 'Praha_13', 'Praha_14', 'Praha_15', 'Praha_16', 'Praha_17', 'Praha_18', 'Praha_19',
-            'Praha_2', 'Praha_20', 'Praha_21', 'Praha_22', 'Praha_3', 'Praha_4', 'Praha_5', 'Praha_6', 'Praha_7', 'Praha_8', 'Praha_9', 'Praha-Běchovice',
-            'Praha-Březiněves', 'Praha-Čakovice', 'Praha-Ďáblice', 'Praha-Dolní_Chabry', 'Praha-Dolní_Měcholupy', 'Praha-Dolní_Počernice', 'Praha-Dubeč',
-            'Praha-Klánovice', 'Praha-Kolovraty', 'Praha-Kunratice', 'Praha-Libuš', 'Praha-Lipence', 'Praha-Lysolaje', 'Praha-Petrovice', 'Praha-Řeporyje',
-            'Praha-Suchdol', 'Praha-Šeberov', 'Praha-Štěrboholy', 'Praha-Troja', 'Praha-Velká_Chuchle', 'Praha-Zbraslav', 'Praha-Zličín'],
-        'r_exclusive': ['0', '1'],
-        'r_min_order_price': ['UNDEF_0', '1_50', '51_100', '101_150', '151_200', '201_250', '251_UNDEF'],
-        'r_min_delivery_time': ['UNDEF_30', '31_60', '61_90', '91_UNDEF']
+        'o_payed_by_label': {
+            'cs': 'Typ platby',
+            'inner': {
+                'platform': ['Cash', 'Credit_Card'],
+                'cs': ['Hotovost', 'Platební karta']
+            }
+        },
+        'o_origin_label': {
+            'cs': 'Původ objednávky',
+            'inner': {
+                'platform': ['App', 'Web'],
+                'cs': ['Aplikace', 'Web']
+            }
+        },
+        'o_distance_a': {
+            'cs': 'Vzdálenost rozvozu',
+            'inner': {
+                'platform': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                'cs': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+            }
+        },
+        'o_first_order':{
+            'cs':'První objednávka',
+            'inner':{
+                'platform': ['0', '1'],
+                'cs': ['Ne', 'Ano']
+            }
+        },
+        'o_delivery_type': {
+            'cs': 'Typ rozvozu',
+            'inner': {
+                'platform':['courier', 'external', 'takeway', 'restaurant'],
+                'cs': ['Kurýr', 'Externí', 'Sebou', 'Vlastní']
+            }
+        },
+        'o_traffic_source_id': {
+            'cs': 'Zdroj objednávky',
+            'inner': {
+                'platform': ['(direct)-(direct)-(not_set)', 'google-organic-(not_set)', 'app-app-', 'mpi.gpwebpay.com-referral-',
+                    'adwords-cpc-brand', 'adwords-cpc-non-brand', 'facebook.com-referral-', 'seznam-organic-(not_set)', 'sklik-cpc-non-brand',
+                    '3dsecure.gpwebpay.com-referral', 'facebook-organic-', 'cj-affil-cj_3753807', 'redir.netcentrum.cz-referral-'],
+                'cs': ['(direct)-(direct)-(not_set)', 'google-organic-(not_set)', 'app-app-', 'mpi.gpwebpay.com-referral-',
+                    'adwords-cpc-brand', 'adwords-cpc-non-brand', 'facebook.com-referral-', 'seznam-organic-(not_set)', 'sklik-cpc-non-brand',
+                    '3dsecure.gpwebpay.com-referral', 'facebook-organic-', 'cj-affil-cj_3753807', 'redir.netcentrum.cz-referral-']
+            }
+        },
+        'o_dayssincepreviousorder': {
+            'cs': 'Dny od poslední objednávky',
+            'inner': {
+                'platform':['0_5', '6_10', '11_30', '31_100', '101_UNDEF'],
+                'cs':['1 až 5', '6 až 10', '11 až 30', '31 až 100', '101 a více' ]
+            }
+        },
+        'o_city': {
+            'cs': 'Destinace objednávky',
+            'inner': {
+                'platform':['Praha', 'Brno', 'Liberec', 'Ostrava', 'Hradec_Králové', 'Olomouc', 'Plzeň', 'České_Budějovice', 'Pardubice', 'Ústí_nad_Labem', 'Zlín',
+                    'Frýdek-Místek', 'Opava', 'Chomutov', 'Mladá_Boleslav'],
+                'cs': ['Praha', 'Brno', 'Liberec', 'Ostrava', 'Hradec Králové', 'Olomouc', 'Plzeň', 'České Budějovice', 'Pardubice', 'Ústí nad Labem', 'Zlín',
+                    'Frýdek-Místek', 'Opava', 'Chomutov', 'Mladá Boleslav']
+            }
+        },
+        'r_city': {
+            'cs':'Lokace restaurace',
+            'inner':{
+                'platform': ['Praha', 'Brno', 'Ostrava', 'Plzeň', 'Liberec', 'Pardubice', 'Hradec_Králové', 'Olomouc', 'České_Budějovice', 'Ústí_nad_Labem', 'Zlín',
+                    'Teplice', 'Karlovy_Vary', 'Mladá_Boleslav', 'Others'],
+                'cs':['Praha', 'Brno', 'Ostrava', 'Plzeň', 'Liberec', 'Pardubice', 'Hradec Králové', 'Olomouc', 'České Budějovice', 'Ústí nad Labem', 'Zlín',
+                    'Teplice', 'Karlovy Vary', 'Mladá Boleslav', 'Others']
+            }
+        },
+        'r_district': {
+            'cs':'Čtvrť restaurace',
+            'inner': {
+                'platform': ['Praha', 'Praha 1', 'Praha 10', 'Praha 11', 'Praha 12', 'Praha 13', 'Praha 14', 'Praha 15', 'Praha 16', 'Praha 17', 'Praha 18', 'Praha 19',
+                    'Praha 2', 'Praha 20', 'Praha 21', 'Praha 22', 'Praha 3', 'Praha 4', 'Praha 5', 'Praha 6', 'Praha 7', 'Praha 8', 'Praha 9', 'Praha-Běchovice',
+                    'Praha-Březiněves', 'Praha-Čakovice', 'Praha-Ďáblice', 'Praha-Dolní Chabry', 'Praha-Dolní Měcholupy', 'Praha-Dolní Počernice', 'Praha-Dubeč',
+                    'Praha-Klánovice', 'Praha-Kolovraty', 'Praha-Kunratice', 'Praha-Libuš', 'Praha-Lipence', 'Praha-Lysolaje', 'Praha-Petrovice', 'Praha-Řeporyje',
+                    'Praha-Suchdol', 'Praha-Šeberov', 'Praha-Štěrboholy', 'Praha-Troja', 'Praha-Velká Chuchle', 'Praha-Zbraslav', 'Praha-Zličín'],
+                'cs': ['Praha', 'Praha_1', 'Praha_10', 'Praha_11', 'Praha_12', 'Praha_13', 'Praha_14', 'Praha_15', 'Praha_16', 'Praha_17', 'Praha_18', 'Praha_19',
+                    'Praha_2', 'Praha_20', 'Praha_21', 'Praha_22', 'Praha_3', 'Praha_4', 'Praha_5', 'Praha_6', 'Praha_7', 'Praha_8', 'Praha_9', 'Praha-Běchovice',
+                    'Praha-Březiněves', 'Praha-Čakovice', 'Praha-Ďáblice', 'Praha-Dolní_Chabry', 'Praha-Dolní_Měcholupy', 'Praha-Dolní_Počernice', 'Praha-Dubeč',
+                    'Praha-Klánovice', 'Praha-Kolovraty', 'Praha-Kunratice', 'Praha-Libuš', 'Praha-Lipence', 'Praha-Lysolaje', 'Praha-Petrovice', 'Praha-Řeporyje',
+                    'Praha-Suchdol', 'Praha-Šeberov', 'Praha-Štěrboholy', 'Praha-Troja', 'Praha-Velká_Chuchle', 'Praha-Zbraslav', 'Praha-Zličín']
+            }
+        },
+        'r_exclusive': {
+            'cs': 'Exkluzivita restaurace',
+            'inner': {
+                'platform': ['0', '1'],
+                'cs': ['Ne', 'Ano']
+            }
+        },
+        'r_min_order_price':  {
+            'cs':'Min. cena objednávky restaurace',
+            'inner': {
+                'platform': ['UNDEF_0', '1_50', '51_100', '101_150', '151_200', '201_250', '251_UNDEF'],
+                'cs': ['0', '1 až 50', '51 až 100', '101 až 150', '151 až 200', '201 až 250', '251 a více']
+            }
+        },
+        'r_min_delivery_time': {
+            'cs':'Cena rozvozu restaurace',
+            'inner': {
+                'platform': ['UNDEF_30', '31_60', '61_90', '91_UNDEF'],
+                'cs': ['1 až 30', '31 až 60', '61 až 90', '91 a více']
+            }
+        }
     }
 
     var $ant_val = $('#ant_val');
     $('#ant_dim').change(function () {
-        var dim = $(this).val(), lcns = combs[dim] || [];
+        var dim = $(this).val(), lcns = translations[dim] == null ? [] : translations[dim]['inner'] || [];
 
-        var html = $.map(lcns, function (lcn) {
-            return '<option value="' + lcn + '">' + lcn + '</option>'
+        var html = $.map(lcns['cs'], function (lcn, idx) {
+            return '<option value="' + lcns['platform'][idx] + '">' + lcn + '</option>'
         }).join('');
         $ant_val.html("<option value='undefined' selected></option>"+html)
     });
 
     var $suk_val = $('#suk_val');
     $('#suk_dim').change(function () {
-        var dim = $(this).val(), lcns = combs[dim] || [];
+        var dim = $(this).val(), lcns = translations[dim] == null ? [] : translations[dim]['inner'] || [];
 
-        var html = $.map(lcns, function (lcn) {
-            return '<option value="' + lcn + '">' + lcn + '</option>'
+        var html = $.map(lcns['cs'], function (lcn, idx) {
+            return '<option value="' + lcns['platform'][idx] + '">' + lcn + '</option>'
         }).join('');
         $suk_val.html("<option value='undefined' selected></option>"+html)
     });
-
-
 </script>
 </body>
 
